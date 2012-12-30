@@ -1,14 +1,16 @@
 (ns woven.test.core
   (:use [woven.core :only
-         [textile wrap-block heading-parse blockquote-parse
-          acronym-parse link-parse]])
-  (:use [clojure.test]))
+         [textile textile-new wrap-block heading-parse blockquote-parse
+          acronym-parse link-parse]]
+        [clojure.test])
+  (:require [clojure.string :as str]))
 
-(deftest empty-input
-  (is (= "" (textile "")))
-  (is (= "" (textile "\n\n\n")))
-  (is (= "" (textile "\r\n\r\n")))
-  (is (= "" (textile "\t\t\t"))))
+;; Lose this: textile should not lose whitespace.
+;; (deftest empty-input
+;;   (is (= "" (textile "")))
+;;   (is (= "" (textile "\n\n\n")))
+;;   (is (= "" (textile "\r\n\r\n")))
+;;   (is (= "" (textile "\t\t\t"))))
 
 (deftest headings
   (is (= "<h1>Heading 1</h1>" (textile "h1. Heading 1")))
@@ -85,4 +87,3 @@
 ;; This fails: current method doesn't handle it yet; need something like re-seq:
 ;;  (is (= "Here're <a href=\"http://two.com\">two</a> small <a href=\"http://links.com\">links</a>."
 ;;         (link-parse "Here're \"two\":http://two.com small \"links\":http://links.com."))))
-

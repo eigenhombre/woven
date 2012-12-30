@@ -100,3 +100,32 @@
 (defn textile [text]
   ;; Parse each line through each of our regexes after cleaning input.
   (textile-parser (split-and-trim-lines text)))
+
+
+;; New stuff
+(defn repltag [name] (format "<%s>$1</%s>" name name))
+
+(def blocktags {
+  #"\*([^*]+?)\*"     "strong"
+  #"_([^_]+?)_"       "em"
+  #"\?\?([^?]+?)\?\?" "cite"
+  #"-([^-]+?)-"       "del"
+  #"\^([^^]+?)\^"     "sup"
+  #"~([^~]+?)~"       "sub"
+  #"%([^%]+?)%"       "span"})
+
+(defn block-matches [text]
+  "Successively apply block functions for all regex's in blocktags
+   There's probably a more elegant way to do this but the recur is
+   straightforward at least."
+  (let [block-functions (for [[pat tag] blocktags]
+                          (fn [s] (str/replace s pat (repltag tag))))]
+    (loop [text text
+           funs block-functions]
+      (if-not (seq funs)
+        text
+        (recur ((first funs) text)
+               (rest funs))))))
+
+(defn textile-new [text]
+  (block-matches text))
