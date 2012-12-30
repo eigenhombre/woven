@@ -88,17 +88,14 @@
         (format "%s<a href=\"%s\">%s</a>%s" pre url text remainder)))))
 
 (defn textile-parser [lines]
-  ;; Return early if empty input provided.
-  (if (nil? (count lines))
-    ""
-    (str/join "\n"
-              ;; Parse the various functions across the lines.
-              (map (fn [line] (-> (blocks-parse line (keys blocks-regex))
-                                 heading-parse
-                                 blockquote-parse
-                                 acronym-parse
-                                 link-parse))
-                   lines))))
+  (str/join "\n"
+            ;; Parse the various functions across the lines.
+            (map (fn [line] (-> (blocks-parse line (keys blocks-regex))
+                                heading-parse
+                                blockquote-parse
+                                acronym-parse
+                                link-parse))
+                 lines)))
 
 (defn textile [text]
   ;; Parse each line through each of our regexes after cleaning input.
