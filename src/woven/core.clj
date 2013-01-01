@@ -102,7 +102,8 @@
   (textile-parser (split-and-trim-lines text)))
 
 
-;; New stuff
+;; New stuff ------------------------------------------------
+
 (defn repltag [name] (format "<%s>$1</%s>" name name))
 
 (def blocktags {
@@ -127,5 +128,26 @@
         (recur ((first funs) text)
                (rest funs))))))
 
+(defn single-header-replace [text rest-of-pattern hn]
+  (str/replace text
+               (re-pattern
+                (format "(?ms)^%s. %s" hn rest-of-pattern))
+               (format "<%s>$1</%s>$2" hn hn)))
+
+(defn replace-all-headers [text n]
+  (let [hn (format "h%d" n)]
+    (-> text
+        (single-header-replace "(.+?)\n\n(.*)" hn)
+        (single-header-replace "(.+?)(\n)$" hn)
+        (single-header-replace "(.+)($)" hn))))
+
 (defn textile-new [text]
-  (block-matches text))
+  (-> text
+      block-matches
+      (replace-all-headers 1)
+      (replace-all-headers 2)
+      (replace-all-headers 3)
+      (replace-all-headers 4)
+      (replace-all-headers 5)
+      (replace-all-headers 6)
+      ))

@@ -5,7 +5,7 @@
         [clojure.test])
   (:require [clojure.string :as str]))
 
-;; Lose this: textile should not lose whitespace.
+;; There's no reason for the parser to reject whitespace in input.
 ;; (deftest empty-input
 ;;   (is (= "" (textile "")))
 ;;   (is (= "" (textile "\n\n\n")))
@@ -13,18 +13,17 @@
 ;;   (is (= "" (textile "\t\t\t"))))
 
 (deftest headings
-  (is (= "<h1>Heading 1</h1>" (textile "h1. Heading 1")))
-  (is (= "<h2>Heading 2</h2>" (textile "h2. Heading 2")))
-  (is (= "<h3>Heading 3</h3>" (textile "h3. Heading 3")))
-  (is (= "<h4>Heading 4</h4>" (textile "h4. Heading 4")))
-  (is (= "<h5>Heading 5</h5>" (textile "h5. Heading 5")))
-  (is (= "<h6>Heading 6</h6>" (textile "h6. Heading 6"))))
+  (doseq [n (range 1 7)]
+    (is (= (format "<h%d>Heading %d</h%d>" n n n) (textile-new (format "h%d. Heading %d" n n))))
+    (is (= (format "<h%d>Heading %d</h%d>\n" n n n) (textile-new (format "h%d. Heading %d\n" n n))))
+    (is (= (format "<h%d>Heading %d\nMore Stuff.</h%d>" n n n)
+           (textile-new (format "h%d. Heading %d\nMore Stuff." n n))))))
 
-(deftest heading-multiline
-  (is (=
-       "<h1>Heading 1</h1>\n<h2>Heading 2</h2>\n<h3>Heading 3</h3>"
-       (textile
-        "h1. Heading 1\nh2. Heading 2\nh3. Heading 3"))))
+;; (deftest heading-multiline
+;;   (is (=
+;;        "<h1>Heading 1</h1>\n\n<h2>Heading 2</h2>\n\n<h3>Heading 3</h3>"
+;;        (textile-new
+;;         "h1. Heading 1\n\nh2. Heading 2\n\nh3. Heading 3"))))
 
 (deftest heading-block-test
   (is (= "<h1>bleh</h1>" (wrap-block "h1" "bleh")))
